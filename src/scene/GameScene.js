@@ -38,7 +38,7 @@ function createGameLayer() {
             var winSize = cc.director.getWinSize();
             this.space = new cp.Space();
 
-            this.space.addCollisionHandler(1, 1, this.collisionBegin.bind(this), this.collisionPre.bind(this), this.collisionPost.bind(this), this.collisionSeparate.bind(this));
+            this.space.addCollisionHandler(1, 2, this.collisionBegin.bind(this), this.collisionPre.bind(this), this.collisionPost.bind(this), this.collisionSeparate.bind(this));
 
 
             this.setupDebugNode();
@@ -117,29 +117,31 @@ function createGameLayer() {
         addMyBox: function () {
             var winSize = cc.director.getWinSize();
             var position = cc.p(winSize.width / 2, winSize.height / 2);
-            var body = new cp.Body(100, cp.momentForBox(100, 48, 48));
+
+            var body = new cp.StaticBody();
+            //var body = new cp.Body(100, cp.momentForBox(100, 48, 48));
             body.setPos(position);
-            this.space.addBody(body);
+            //this.space.addBody(body);
 
             var shape = new cp.BoxShape(body, 48, 48);
             shape.setElasticity(0);
             shape.setFriction(0);
 
-            shape.setCollisionType(1);
+            shape.setCollisionType(2);
             shape.group = 2;
 
             this.space.addShape(shape);
 
             var sprite = new cc.PhysicsSprite(res.my_box);
             sprite.setBody(body);
-            sprite.setPosition(cc.p(position.x, position.y));
-
+            //sprite.setPosition(cc.p(position.x, position.y));
+            //sprite.getBody().setPos(cc.p(100, 100));
             this.addMoveEvent(sprite);
             this.addChild(sprite);
         },
 
         addNewSpriteAtPosition: function (p) {
-            var box = this.createBox(1, p);
+            var box = this.createBox(3, p);
             this.addChild(box);
             box.body.applyImpulse(cp.v(15000, 11500), cp.v(0, 0));
 
@@ -191,8 +193,8 @@ function createGameLayer() {
                     var pos = touch.getLocation();
                     var target = event.getCurrentTarget();
                     if ( cc.rectContainsPoint(target.getBoundingBox(), pos) ) {
-
-                        target.setPosition(pos);
+                       target.getBody().setPos(pos);
+                        //target.setPosition(pos);
 
                         return true;
                     }
@@ -220,6 +222,7 @@ function createGameLayer() {
                 this.space.step(this.stepTime);
                 this.timeRemain -= this.stepTime;
             }
+            this.space.reindexStatic();
             //this.space.step(timeStep);
         }
     });
